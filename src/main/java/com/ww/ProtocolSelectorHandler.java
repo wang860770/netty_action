@@ -1,8 +1,10 @@
 package com.ww;
 
+import com.ww.common.handler.ServerHeartBeatHandler;
 import com.ww.http.MyHttpServerHandler;
 import com.ww.tcp.CustomDecoder;
-import com.ww.tcp.CutsomServerHandler;
+import com.ww.tcp.CustomEncoder;
+import com.ww.tcp.CustomServerHandler;
 import com.ww.websocket.MyTextWebSocketFrameHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,6 +13,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
 
 import java.util.List;
@@ -79,7 +82,8 @@ public class ProtocolSelectorHandler extends ByteToMessageDecoder {
      */
     private boolean isCustomProcotol(ByteBuf byteBuf) {
         byteBuf.markReaderIndex();
-        byte[] content = new byte[SPACE_LENGTH];
+        int length=Math.min(byteBuf.readableBytes(),SPACE_LENGTH);
+        byte[] content = new byte[length];
         byteBuf.readBytes(content);
         byteBuf.resetReaderIndex();
         String s = new String(content, CharsetUtil.UTF_8);
@@ -103,8 +107,12 @@ public class ProtocolSelectorHandler extends ByteToMessageDecoder {
      * @param pipeline
      */
     private void addTCPProtocolHandlers(ChannelPipeline pipeline) {
+//        pipeline.addLast(new StringDecoder());
+        pipeline.addLast(new IdleStateHandler(2,0,0));
+        pipeline.addLast(new CustomEncoder());
+        pipeline.addLast(new ServerHeartBeatHandler());
         pipeline.addLast(new CustomDecoder(1024, 1, 4));
-        pipeline.addLast(new CutsomServerHandler());
+        pipeline.addLast(new CustomServerHandler());
     }
 
 
