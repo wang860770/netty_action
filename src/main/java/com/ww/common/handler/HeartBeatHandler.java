@@ -2,7 +2,6 @@ package com.ww.common.handler;
 
 import com.ww.tcp.SimpleProtocol;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -20,13 +19,9 @@ public abstract class HeartBeatHandler extends ChannelInboundHandlerAdapter {
         if (receiveHeart < 0) {
             byteBuf.skipBytes(4);//略过长度
             if (receiveHeart == PING) {
-//                System.out.println(String.format("收到[%s]发来的PING", ctx.channel().remoteAddress()));
                 handlePing(ctx);
-//                System.out.println(String.format("发送[%s]发来的PONG", ctx.channel().remoteAddress()));
             } else {
-//                System.out.println(String.format("收到[%s]发来的PONG", ctx.channel().remoteAddress()));
                 handlePong(ctx);
-
             }
             byteBuf.release();
         } else {
@@ -40,16 +35,7 @@ public abstract class HeartBeatHandler extends ChannelInboundHandlerAdapter {
         SimpleProtocol simpleProtocol = new SimpleProtocol();
         simpleProtocol.setProtocolType(heart);
         simpleProtocol.setBodyLength(0);
-        ChannelFuture channelFuture = ctx.writeAndFlush(simpleProtocol);
-//        channelFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
-//            @Override
-//            public void operationComplete(Future<? super Void> future) throws Exception {
-//                if(!future.isSuccess())     {
-//                    System.out.println(future.cause());
-//                }
-//            }
-//        });
-//        System.out.println(String.format("发送%s到[%s]", heart==-1?"Ping":"PONG", ctx.channel().remoteAddress()) + ", 已发送心跳个数: " + heartBeatCount);
+       ctx.writeAndFlush(simpleProtocol);
     }
 
 

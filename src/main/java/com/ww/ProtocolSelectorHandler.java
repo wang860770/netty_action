@@ -2,7 +2,7 @@ package com.ww;
 
 import com.ww.common.handler.ServerHeartBeatHandler;
 import com.ww.http.MyHttpServerHandler;
-import com.ww.tcp.CustomDecoder;
+import com.ww.tcp.CustomDecoderV2;
 import com.ww.tcp.CustomEncoder;
 import com.ww.tcp.CustomServerHandler;
 import com.ww.websocket.MyTextWebSocketFrameHandler;
@@ -38,7 +38,7 @@ public class ProtocolSelectorHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        System.out.println("before :" + ctx.pipeline().toString());
+//        System.out.println("before :" + ctx.pipeline().toString());
         if (isWebSocketUrl(in)) {
             System.out.println("addWebSocketHandlers");
 
@@ -52,7 +52,7 @@ public class ProtocolSelectorHandler extends ByteToMessageDecoder {
             addHTTPHandlers(ctx.pipeline());
         }
         ctx.pipeline().remove(this);
-        System.out.println("after :" + ctx.pipeline().toString());
+//        System.out.println("after :" + ctx.pipeline().toString());
     }
 
     /**
@@ -107,11 +107,11 @@ public class ProtocolSelectorHandler extends ByteToMessageDecoder {
      * @param pipeline
      */
     private void addTCPProtocolHandlers(ChannelPipeline pipeline) {
-//        pipeline.addLast(new StringDecoder());
         pipeline.addLast(new IdleStateHandler(2,0,0));
         pipeline.addLast(new CustomEncoder());
         pipeline.addLast(new ServerHeartBeatHandler());
-        pipeline.addLast(new CustomDecoder(1024, 1, 4));
+        pipeline.addLast(new CustomDecoderV2());
+//        pipeline.addLast(new CustomDecoder(1024, 1, 4));
         pipeline.addLast(new CustomServerHandler());
     }
 

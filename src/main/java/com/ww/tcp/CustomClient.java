@@ -10,13 +10,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CustomClient {
+    /**
+     * 断线重连的间隔
+     */
+    private final static int RECONNECT_TIME_INTERVAL = 5000;
     EventLoopGroup group;
     ExecutorService executor;
     private int reconnectCount;
     /**
      * 重试的最大次数
      */
-    private static final int RECONNECT_MAX_COUNT=3;
+    private static final int RECONNECT_MAX_COUNT = 3;
+
     public CustomClient() {
         executor = Executors.newSingleThreadExecutor();
         group = new NioEventLoopGroup();
@@ -37,13 +42,15 @@ public class CustomClient {
         } finally {
             executor.execute(() -> {
                 try {
-                    reconnectCount++;
-                    System.out.println("开始重连，重连次数:"+reconnectCount);
-                    if(reconnectCount==RECONNECT_MAX_COUNT){
+                    Thread.sleep(RECONNECT_TIME_INTERVAL);
+
+                    if (reconnectCount == RECONNECT_MAX_COUNT) {
                         System.out.println("关闭客户端");
                         group.shutdownGracefully();
                         executor.shutdown();
-                    }else {
+                    } else {
+                        reconnectCount++;
+                        System.out.println("开始重连，重连次数:" + reconnectCount);
                         connect(ip, port);
                     }
 

@@ -14,10 +14,11 @@ public class CustomClientHandlerInitializer extends ChannelInitializer<SocketCha
     protected void initChannel(SocketChannel ch) throws Exception {
 
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new IdleStateHandler(0,0,3));
+        pipeline.addLast(new IdleStateHandler(0, 0, 5));
         pipeline.addLast(new CustomEncoder());
         pipeline.addLast(new ClientHeartBeatHandler());
-        pipeline.addLast(new CustomDecoder(1024, 1, 4));
+//        pipeline.addLast(new CustomDecoderV1(1024, 1, 4));
+        pipeline.addLast(new CustomDecoderV2());
         pipeline.addLast(new CustomClientHandler());
 
     }

@@ -4,10 +4,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
-public class CustomDecoder extends LengthFieldBasedFrameDecoder {
+public class CustomDecoderV1 extends LengthFieldBasedFrameDecoder {
 
 
-    public CustomDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) {
+    public CustomDecoderV1(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) {
         super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
     }
 
